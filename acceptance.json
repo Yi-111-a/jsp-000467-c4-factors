@@ -1,0 +1,7 @@
+{
+  "jsp_id": "JSP-000467",
+  "catalog_url": "https://github.com/TheJustinSunPrize/awards/blob/main/problems/catalog-0401-0500.md#JSP-000467",
+  "original_question_en": "What minimum degree forces a spanning collection of vertex-disjoint four-cycles?",
+  "required_theorems": ["spanning_c4_factors_min_degree"],
+  "notes": "Target is Wang (Wa10) resolution of the Erdős–Faudree conjecture on quadrilaterals. Exact degree threshold and parity must match the official statement."
+}
