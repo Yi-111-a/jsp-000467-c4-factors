@@ -32,7 +32,7 @@ theorem exists_four_partition {k : ℕ} : ∀ {s : Finset V}, s.card = 4 * k →
     obtain ⟨t, hts, htcard⟩ :=
       Finset.le_card_iff_exists_subset_card.1 (by omega : 4 ≤ s.card)
     have hsdiff : (s \ t).card = 4 * k := by
-      rw [Finset.card_sdiff hts, hs, htcard]; omega
+      rw [Finset.card_sdiff_of_subset hts, hs, htcard]; omega
     obtain ⟨S', hsub, hpair, hcov⟩ := ih hsdiff
     refine ⟨insert t S', ?_, ?_, ?_⟩
     · intro u hu
