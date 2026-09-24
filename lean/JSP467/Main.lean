@@ -29,9 +29,10 @@ variable {V : Type*} [Fintype V] [DecidableEq V] (G : SimpleGraph V)
 
 /-- A 4-element vertex set `s` is a *quadrilateral block* of `G` when the
 subgraph induced by `s` contains a copy of `C₄` (necessarily spanning `s`,
-since `s` has exactly four vertices). -/
+since `s` has exactly four vertices).  The copy need not be induced: a block
+may carry extra edges (e.g. `K₄` is a quadrilateral block). -/
 def IsQuadBlock (s : Finset V) : Prop :=
-  s.card = 4 ∧ Nonempty (cycleGraph 4 ↪g G.induce (s : Set V))
+  s.card = 4 ∧ Nonempty ((cycleGraph 4).Copy (G.induce (s : Set V)))
 
 /-- `G` has a *spanning quadrilateral factor*: a family of pairwise-disjoint
 quadrilateral blocks covering every vertex. -/
