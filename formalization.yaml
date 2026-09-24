@@ -5,7 +5,7 @@ prize_ready: false
 github_owner: Yi-111-a
 lean_repository: https://github.com/Yi-111-a/jsp-000467-c4-factors
 branch: main
-commit_sha: ""
+commit_sha: "0a065533c634f41bbc3476348ffc619e860c9c08"
 headline_theorems:
   - spanning_c4_factors_min_degree
 roles:
