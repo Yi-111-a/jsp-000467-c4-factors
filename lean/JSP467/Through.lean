@@ -1,4 +1,5 @@
 import JSP467.Defs
+import Mathlib.Algebra.Order.BigOperators.Group.Finset
 
 /-!
 # JSP-000467 — the pigeonhole step of Wang's argument
@@ -35,12 +36,12 @@ theorem exists_isQuadBlock_self {V : Type*} [Fintype V] [DecidableEq V]
     refine Finset.disjoint_left.2 fun x hxu hxw => ?_
     obtain ⟨hxv, hux⟩ := Finset.mem_erase.1 hxu
     obtain ⟨-, hwx⟩ := Finset.mem_erase.1 hxw
-    have hux' : G.Adj u x := (G.mem_neighborFinset x).1 hux
-    have hwx' : G.Adj w x := (G.mem_neighborFinset x).1 hwx
-    have hvu : G.Adj v u := (G.mem_neighborFinset u).1 hu
-    have hvw : G.Adj v w := (G.mem_neighborFinset w).1 hw
+    have hux' : G.Adj u x := (G.mem_neighborFinset u x).1 hux
+    have hwx' : G.Adj w x := (G.mem_neighborFinset w x).1 hwx
+    have hvu : G.Adj v u := (G.mem_neighborFinset v u).1 hu
+    have hvw : G.Adj v w := (G.mem_neighborFinset v w).1 hw
     have hblock : G.IsQuadBlock {v, u, x, w} :=
-      G.IsQuadBlock.of_cycle rfl hvu.ne hxv.symm hvw.ne hux'.ne huw hwx'.ne'
+      IsQuadBlock.of_cycle rfl hvu.ne hxv.symm hvw.ne hux'.ne huw hwx'.ne'
         hvu hux' hwx'.symm hvw.symm
     exact hnone ⟨_, hblock, Finset.mem_insert_self v _⟩
   -- The union of the `N(u) \ {v}` lies inside `V \ {v}`.
@@ -69,13 +70,14 @@ theorem exists_isQuadBlock_self {V : Type*} [Fintype V] [DecidableEq V]
       _ ≤ ∑ u ∈ G.neighborFinset v, ((G.neighborFinset u).erase v).card := by
           refine Finset.sum_le_sum fun u hu => ?_
           have hvmem : v ∈ G.neighborFinset u :=
-            (G.mem_neighborFinset v).2 ((G.mem_neighborFinset u).1 hu).symm
+            (G.mem_neighborFinset u v).2 ((G.mem_neighborFinset v u).1 hu).symm
           rw [Finset.card_erase_of_mem hvmem]
           have hdu : d ≤ (G.neighborFinset u).card :=
             hd.trans (G.minDegree_le_degree u)
           omega
   -- So `d * (d - 1) ≤ |V| - 1`, contradicting `|V| < d * (d - 1) + 1`.
   have hcontra : d * (d - 1) ≤ Fintype.card V - 1 := hsum.trans hle
+  have hpos : 0 < Fintype.card V := Fintype.card_pos_iff.mpr ⟨v⟩
   omega
 
 end SimpleGraph
