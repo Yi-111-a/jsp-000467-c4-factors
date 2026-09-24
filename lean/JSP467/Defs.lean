@@ -2,6 +2,7 @@ import Mathlib.Combinatorics.SimpleGraph.Finite
 import Mathlib.Combinatorics.SimpleGraph.CycleGraph
 import Mathlib.Combinatorics.SimpleGraph.Copy
 import Mathlib.Combinatorics.SimpleGraph.Maps
+import Mathlib.Data.Fin.VecNotation
 
 /-!
 # JSP-000467 — definitions and quadrilateral-block API
@@ -45,31 +46,31 @@ theorem IsQuadBlock.of_cycle {s : Finset V} {a b c d : V}
   have hcard : s.card = 4 := by
     rw [hs]
     simp [hab, hac, had, hbc, hbd, hcd]
-  refine ⟨hcard, ⟨?_⟩⟩
   have hmem : ∀ i : Fin 4, ![a, b, c, d] i ∈ (↑s : Set V) := by
     intro i
     fin_cases i <;> simp [hs]
-  let f : cycleGraph 4 →g G.induce (↑s : Set V) where
-    toFun i := ⟨![a, b, c, d] i, hmem i⟩
-    map_rel' := by
-      rintro ⟨i, -⟩ ⟨j, -⟩ h
-      rw [cycleGraph_adj'] at h
-      fin_cases i <;> fin_cases j <;> simp_all
-  exact f.toCopy (by
-    intro i j hij
+  have e1' : G.Adj b a := e1.symm
+  have e2' : G.Adj c b := e2.symm
+  have e3' : G.Adj d c := e3.symm
+  have e4' : G.Adj a d := e4.symm
+  refine ⟨hcard, ⟨⟨⟨fun i => ⟨![a, b, c, d] i, hmem i⟩, ?_⟩, ?_⟩⟩⟩
+  · rintro i j h
+    rw [induce_adj]
+    rw [cycleGraph_adj'] at h
+    fin_cases i <;> fin_cases j <;> simp_all <;> exact absurd h (by decide)
+  · intro i j hij
     have h' : ![a, b, c, d] i = ![a, b, c, d] j := congrArg Subtype.val hij
-    fin_cases i <;> fin_cases j <;> simp_all)
+    fin_cases i <;> fin_cases j <;> simp_all
 
 /-- Monotonicity: a quadrilateral block stays a block in any supergraph. -/
 theorem IsQuadBlock.mono {H : SimpleGraph V} (hGH : G ≤ H) {s : Finset V}
     (hs : G.IsQuadBlock s) : H.IsQuadBlock s := by
   obtain ⟨hc, ⟨f⟩⟩ := hs
   refine ⟨hc, ⟨?_⟩⟩
-  let g : G.induce (↑s : Set V) →g H.induce (↑s : Set V) where
-    toFun := id
-    map_rel' h := hGH h
-  exact ⟨(g.comp f.toHom).toCopy
-    ((Function.injective_id).comp f.injective)⟩
+  let g : G.induce (↑s : Set V) →g H.induce (↑s : Set V) := ⟨id, fun h => hGH h⟩
+  refine (g.comp f.toHom).toCopy ?_
+  intro x y hxy
+  exact f.injective' hxy
 
 /-- One quadrilateral block covering all vertices is a quad factor. -/
 theorem HasQuadFactor.of_block_eq_univ {s : Finset V} (hs : s = Finset.univ)
@@ -84,9 +85,9 @@ theorem HasQuadFactor.of_block_eq_univ {s : Finset V} (hs : s = Finset.univ)
   · simp [hs]
 
 /-- Adding a fresh disjoint block to a quad factor on the remaining vertices. -/
-theorem HasQuadFactor.insert {s : Finset V} {S : Finset (Finset V)}
+theorem HasQuadFactor.insert_block {s : Finset V} {S : Finset (Finset V)}
     (hs : G.IsQuadBlock s)
-    (hcov : insert s (S.biUnion id) = Finset.univ)
+    (hcov : s ∪ S.biUnion id = Finset.univ)
     (hblk : ∀ t ∈ S, G.IsQuadBlock t)
     (hpair : ∀ t₁ ∈ S, ∀ t₂ ∈ S, t₁ ≠ t₂ → Disjoint t₁ t₂)
     (hdis : ∀ t ∈ S, Disjoint s t) :
@@ -97,13 +98,13 @@ theorem HasQuadFactor.insert {s : Finset V} {S : Finset (Finset V)}
     · exact hs
     · exact hblk t ht
   · intro t₁ h₁ t₂ h₂ hne
-    rcases Finset.mem_insert.1 h₁ with rfl | h₁
-    · rcases Finset.mem_insert.1 h₂ with rfl | h₂
+    rcases Finset.mem_insert.1 h₁ with rfl | h₁mem
+    · rcases Finset.mem_insert.1 h₂ with rfl | h₂mem
       · exact absurd rfl hne
-      · exact hdis t₂ h₂
-    · rcases Finset.mem_insert.1 h₂ with rfl | h₂
-      · exact (hdis t₁ h₁).symm
-      · exact hpair t₁ h₁ t₂ h₂ hne
+      · exact hdis t₂ h₂mem
+    · rcases Finset.mem_insert.1 h₂ with rfl | h₂mem
+      · exact (hdis t₁ h₁mem).symm
+      · exact hpair t₁ h₁mem t₂ h₂mem hne
   · rw [Finset.biUnion_insert]
     exact hcov
 
