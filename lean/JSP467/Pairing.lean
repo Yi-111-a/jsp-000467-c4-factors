@@ -4,6 +4,7 @@ import Mathlib.Combinatorics.SimpleGraph.Copy
 import Mathlib.Combinatorics.SimpleGraph.Finite
 import Mathlib.Data.Fin.VecNotation
 import Mathlib.Algebra.BigOperators.Group.Finset.Basic
+import Mathlib.Algebra.Order.BigOperators.Group.Finset
 
 /-!
 # Pairing and exchange lemmas for quadrilateral blocks
@@ -113,7 +114,18 @@ theorem IsQuadBlock.exchange [DecidableRel G.Adj] {s : Finset V} {v : V}
     rw [hs4]
     ext w
     simp only [Finset.mem_insert, Finset.mem_erase, Finset.mem_singleton]
-    tauto
+    constructor
+    · rintro (rfl | ⟨hwxj, rfl | rfl | rfl | rfl⟩)
+      · exact Or.inl rfl
+      · exact absurd rfl hwxj
+      · exact Or.inr (Or.inl rfl)
+      · exact Or.inr (Or.inr (Or.inl rfl))
+      · exact Or.inr (Or.inr (Or.inr rfl))
+    · rintro (rfl | rfl | rfl | rfl)
+      · exact Or.inl rfl
+      · exact Or.inr ⟨fun h => hne'.1 (hinj h), Or.inr (Or.inl rfl)⟩
+      · exact Or.inr ⟨fun h => hne'.2.1 (hinj h), Or.inr (Or.inr (Or.inl rfl))⟩
+      · exact Or.inr ⟨fun h => hne'.2.2.1 (hinj h), Or.inr (Or.inr (Or.inr rfl))⟩
   have hvne : ∀ i : Fin 4, v ≠ x i := fun i h => hv (h.symm ▸ hxs i)
   exact IsQuadBlock.of_cycle hset
     (hvne (j + 1)) (hvne (j + 2)) (hvne (j + 3))
@@ -145,7 +157,7 @@ theorem exists_block_ge_degree [DecidableRel G.Adj] {S : Finset (Finset V)}
     calc ∑ s ∈ S, (s ∩ G.neighborFinset v).card
         ≤ ∑ _s ∈ S, (r - 1) :=
           Finset.sum_le_sum fun s hs => by have hlt := hcon s hs; omega
-      _ = S.card * (r - 1) := by rw [Finset.sum_const, nsmul_eq_mul]
+      _ = S.card * (r - 1) := by rw [Finset.sum_const, smul_eq_mul]
   omega
 
 end SimpleGraph
