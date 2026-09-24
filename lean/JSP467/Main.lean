@@ -1,7 +1,4 @@
-import Mathlib.Combinatorics.SimpleGraph.Finite
-import Mathlib.Combinatorics.SimpleGraph.CycleGraph
-import Mathlib.Combinatorics.SimpleGraph.Copy
-import Mathlib.Combinatorics.SimpleGraph.Maps
+import JSP467.Defs
 import Mathlib.Combinatorics.SimpleGraph.Bipartite
 import Mathlib.Combinatorics.SimpleGraph.Hamiltonian
 
@@ -26,21 +23,6 @@ open Finset
 namespace SimpleGraph
 
 variable {V : Type*} [Fintype V] [DecidableEq V] (G : SimpleGraph V)
-
-/-- A 4-element vertex set `s` is a *quadrilateral block* of `G` when the
-subgraph induced by `s` contains a copy of `C₄` (necessarily spanning `s`,
-since `s` has exactly four vertices).  The copy need not be induced: a block
-may carry extra edges (e.g. `K₄` is a quadrilateral block). -/
-def IsQuadBlock (s : Finset V) : Prop :=
-  s.card = 4 ∧ Nonempty ((cycleGraph 4).Copy (G.induce (s : Set V)))
-
-/-- `G` has a *spanning quadrilateral factor*: a family of pairwise-disjoint
-quadrilateral blocks covering every vertex. -/
-def HasQuadFactor : Prop :=
-  ∃ S : Finset (Finset V),
-    (∀ s ∈ S, G.IsQuadBlock s) ∧
-    (∀ s ∈ S, ∀ t ∈ S, s ≠ t → Disjoint s t) ∧
-    S.biUnion id = Finset.univ
 
 /-! ## The Erdős–Faudree conjecture, proved by Wang (2010) -/
 
