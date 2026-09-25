@@ -229,7 +229,7 @@ theorem freed_w_heavy_of_rotBound (G : SimpleGraph V) [DecidableRel G.Adj]
     rw [hcov, Finset.mem_union, Finset.mem_singleton] at hxU'
     rcases hxU' with hx | rfl
     · exact Finset.mem_inter.2 ⟨hx, hxw⟩
-    · exact absurd hxw (fun h => G.ne_of_adj h rfl)
+    · exact absurd hxw (fun h => ((G.mem_neighborFinset _ _).1 h).ne rfl)
   have h3 := Finset.card_le_card hsub2
   -- `w` has at least `2k - (2 * (k - S.card) - 1) = 2 * S.card + 1`
   -- covered neighbours.

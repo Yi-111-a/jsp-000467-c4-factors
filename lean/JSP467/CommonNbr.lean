@@ -143,7 +143,7 @@ theorem no_quadBlock_iff_common_le_one [DecidableRel G.Adj] {U : Finset V} :
     intro hU a ha b hb hab
     by_contra hle
     obtain ⟨Q, hQU, hQ⟩ :=
-      exists_quadBlock_of_two_common ha hb hab (by omega)
+      exists_quadBlock_of_two_common (G := G) ha hb hab (by omega)
     exact hU Q hQU hQ
   · -- A quad block inside `U` would give a pair with two common neighbours.
     intro hle Q hQU hQb
