@@ -123,6 +123,7 @@ theorem exists_larger_of_three_blocks {S : Finset (Finset V)}
         Finset.card_insert_of_notMem hQ₃nin,
         Finset.card_erase_add_one hB₂',
         Finset.card_erase_add_one hB₁]
+    omega
 
 /-- Corollary: three pairwise-disjoint quadrilateral blocks inside the
 two-block region `U ∪ B₁ ∪ B₂` (the leftover plus the two blocks `B₁, B₂`)
@@ -150,7 +151,7 @@ theorem exists_larger_of_two_regions {S : Finset (Finset V)}
     obtain ⟨hCB₁, hCS⟩ := Finset.mem_erase.1 hCer
     have hmem := hQ hx
     rw [Finset.mem_union, Finset.mem_union] at hmem
-    rcases hmem with hleft | hxB₁ | hxB₂
+    rcases hmem with (hleft | hxB₁) | hxB₂
     · exact (Finset.mem_sdiff.1 hleft).2 (Finset.mem_biUnion.2 ⟨C, hCS, hxC⟩)
     · have hd : Disjoint B₁ C := hS.2 B₁ hB₁ C hCS fun h => hCB₁ h.symm
       exact Finset.disjoint_left.1 hd hxB₁ hxC
