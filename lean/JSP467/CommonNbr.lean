@@ -78,11 +78,13 @@ theorem IsQuadBlock.two_common [DecidableRel G.Adj] {s : Finset V}
       s ∩ G.neighborFinset a ∩ G.neighborFinset b := by
     intro z hz
     simp only [Finset.mem_insert, Finset.mem_singleton] at hz
-    rcases hz with rfl | rfl
-    · exact Finset.mem_inter.2 ⟨Finset.mem_inter.2
+    rcases hz with hzx | hzy
+    · rw [hzx]
+      exact Finset.mem_inter.2 ⟨Finset.mem_inter.2
         ⟨hxs, (G.mem_neighborFinset a x).2 e_ax⟩,
         (G.mem_neighborFinset b x).2 e_xb.symm⟩
-    · exact Finset.mem_inter.2 ⟨Finset.mem_inter.2
+    · rw [hzy]
+      exact Finset.mem_inter.2 ⟨Finset.mem_inter.2
         ⟨hys, (G.mem_neighborFinset a y).2 e_ya.symm⟩,
         (G.mem_neighborFinset b y).2 e_by⟩
   rw [← Finset.card_pair hxy]
