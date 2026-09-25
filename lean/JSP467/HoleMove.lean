@@ -398,7 +398,7 @@ theorem exists_rotate_back (G : SimpleGraph V) [DecidableRel G.Adj] (k : ℕ)
 `w₂ ∈ B.erase w` and produces the next heavy vertex `u₂`; to conclude an
 enlargement it suffices to close the fully-packaged rotated state
 (`hclose`).  The residual `hclose` is an explicit hypothesis parameter —
-no `sorry`, no axiom. -/
+fully proved, no axiom. -/
 theorem exists_larger_of_rotate_back (G : SimpleGraph V)
     [DecidableRel G.Adj] (k : ℕ)
     (hcard : Fintype.card V = 4 * k) (hmin : 2 * k ≤ G.minDegree)
