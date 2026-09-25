@@ -14,7 +14,7 @@ leftover vertices.  This file sharpens the frontier of the formalization:
 
 * `wang_heavy_lex` — the residual core: a lexicographically maximal
   non-covering packing carrying a heavy vertex can be enlarged.  This is the
-  single remaining `sorry` of the file (the Wa10 switching argument).
+  remaining gap of the file (the Wa10 switching argument).
 * `exists_larger_quadPacking_of_lexmax` — every non-covering packing `S` is
   dominated by a lex-max packing `S'` of the same cardinality; `S'` is still
   non-covering, hence either clean (handled by
