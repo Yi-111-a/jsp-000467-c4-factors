@@ -46,8 +46,11 @@ theorem IsQuadBlock.of_induce {G : SimpleGraph V} {s : Set V} {t : Finset ↥s}
       ((G.induce s).induce (↑t : Set ↥s)).Adj u v →
       (G.induce (↑(t.image Subtype.val) : Set V)).Adj (e u) (e v) :=
     fun huv => induce_adj.2 (induce_adj.1 (induce_adj.1 huv))
-  have he : Function.Injective e := fun a b hab =>
-    Subtype.ext (Subtype.ext (congrArg Subtype.val hab))
+  have he : Function.Injective e := fun a b hab => by
+    apply Subtype.ext
+    apply Subtype.ext
+    have h : (e a).val = (e b).val := congrArg Subtype.val hab
+    exact h
   exact (Hom.toCopy
     (⟨e, fun huv => hmap huv⟩ :
       (G.induce s).induce (↑t : Set ↥s) →g
@@ -67,12 +70,12 @@ theorem exists_larger_quadPacking_of_clean (G : SimpleGraph V) [DecidableRel G.A
   obtain ⟨hblk, hpair⟩ := hS
   set U : Finset V := Finset.univ \ S.biUnion id with hU_def
   -- The set `U` of uncovered vertices is nonempty.
-  have hUne : U.Nonempty := by
+  obtain ⟨u0, hu0⟩ : ∃ u, u ∈ U := by
     have hss : S.biUnion id ⊂ Finset.univ :=
       Finset.ssubset_iff_subset_ne.2 ⟨Finset.subset_univ _, hncov⟩
     obtain ⟨x, -, hx⟩ := Finset.exists_of_ssubset hss
     exact ⟨x, Finset.mem_sdiff.2 ⟨Finset.mem_univ x, hx⟩⟩
-  obtain ⟨u0, hu0⟩ := hUne
+  have hUne : U.Nonempty := ⟨u0, hu0⟩
   haveI : Nonempty ↥(↑U : Set V) := ⟨⟨u0, Finset.mem_coe.2 hu0⟩⟩
   have hUpos : 0 < U.card := Finset.card_pos.2 hUne
   -- The blocks of `S` are pairwise disjoint sets of four vertices.
@@ -129,7 +132,11 @@ theorem exists_larger_quadPacking_of_clean (G : SimpleGraph V) [DecidableRel G.A
     have hmap := congrArg Finset.card (G.map_neighborFinset_induce v)
     rw [Finset.card_map, Finset.toFinset_coe] at hmap
     have hdeg : (G.induce (↑U : Set V)).degree v
-        = (G.neighborFinset (v : V) ∩ U).card := hmap
+        = (G.neighborFinset (v : V) ∩ U).card := by
+      rw [← SimpleGraph.card_neighborFinset_eq_degree, ← hmap]
+      congr 1
+      ext w
+      simp only [SimpleGraph.mem_neighborFinset]
     rw [hdeg]
     exact hUdeg _ hvU
   -- Find a quadrilateral block of `G` inside `U`.
@@ -154,7 +161,7 @@ theorem exists_larger_quadPacking_of_clean (G : SimpleGraph V) [DecidableRel G.A
         fun x hx => Finset.mem_coe.1 (hQsub x hx)⟩
     · -- `U` has `4 * ℓ` vertices with `ℓ ≥ 2`: use the pigeonhole lemma.
       have hℓ2 : 2 ≤ k - S.card := by omega
-      obtain ⟨v0⟩ := hU0
+      obtain ⟨v0⟩ : Nonempty ↥(↑U : Set V) := ⟨⟨u0, Finset.mem_coe.2 hu0⟩⟩
       have hbig : Fintype.card ↥(↑U : Set V)
           < 2 * (k - S.card) * (2 * (k - S.card) - 1) + 1 := by
         rw [hGUcard]
@@ -183,13 +190,13 @@ theorem exists_larger_quadPacking_of_clean (G : SimpleGraph V) [DecidableRel G.A
     · exact hQblk
     · exact hblk t ht
   · intro t₁ h₁ t₂ h₂ hne
-    rcases Finset.mem_insert.1 h₁ with rfl | h₁
-    · rcases Finset.mem_insert.1 h₂ with rfl | h₂
-      · exact absurd rfl hne
-      · exact hQdisj t₂ h₂
-    · rcases Finset.mem_insert.1 h₂ with rfl | h₂
-      · exact (hQdisj t₁ h₁).symm
-      · exact hpair t₁ h₁ t₂ h₂ hne
+    rcases Finset.mem_insert.1 h₁ with h₁e | h₁mem
+    · rcases Finset.mem_insert.1 h₂ with h₂e | h₂mem
+      · exact absurd (h₁e.trans h₂e.symm) hne
+      · exact h₁e ▸ hQdisj t₂ h₂mem
+    · rcases Finset.mem_insert.1 h₂ with h₂e | h₂mem
+      · exact h₂e ▸ (hQdisj t₁ h₁mem).symm
+      · exact hpair t₁ h₁mem t₂ h₂mem hne
   · rw [Finset.card_insert_of_notMem hQnotMem]
     exact Nat.lt_succ_self S.card
 
