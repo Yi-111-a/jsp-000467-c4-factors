@@ -61,4 +61,12 @@ def IsStrongFeasibleChain (T : Finset V) (S : Finset (Finset V)) (x0 : V)
     [DecidableRel G.Adj] : Prop :=
   G.IsFeasibleChain T S x0 ∧ ∃ x1 ∈ T, G.Adj x0 x1
 
+/-- A *paw* on `U`: a triangle `T ⊆ U` together with a fourth vertex
+`x₀ ∈ U \ T` whose only neighbour inside `U` is a vertex `x₁ ∈ T` (the
+pendant edge `x₀x₁`).  On four vertices, `≥ 4` edges and no `C₄` is exactly
+a paw (Wang's `F = x₀x₁x₂x₃x₁`). -/
+def IsPaw (U : Finset V) : Prop :=
+  ∃ T : Finset V, ∃ x0 x1 : V, G.IsTriangle T ∧ T ⊆ U ∧ x0 ∈ U ∧ x0 ∉ T ∧
+    x1 ∈ T ∧ G.Adj x0 x1 ∧ (∀ y ∈ U, G.Adj x0 y → y = x1)
+
 end SimpleGraph
