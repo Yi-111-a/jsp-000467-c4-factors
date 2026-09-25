@@ -19,12 +19,10 @@ side, so it contains at most `k - 1` disjoint quadrilaterals.
 
 ## Structure of the formalization
 
-The headline theorem `spanning_c4_factors_min_degree` is reduced to a single
-open step, `exists_larger_quadPacking`: any quadrilateral packing that does not
-cover the whole vertex set can be enlarged.  Everything else — the notion of
-packing (`IsQuadPacking`), existence of a maximum-cardinality packing
-(`exists_max_card_quadPacking`), and the final maximality contradiction — is
-proved in full here.
+This module defines quadrilateral packings (`IsQuadPacking`) and proves
+existence of a maximum-cardinality packing (`exists_max_card_quadPacking`).
+The enlargement step and the headline theorem
+`spanning_c4_factors_min_degree` are assembled downstream in `JSP467.Top`.
 -/
 
 open Finset
@@ -72,37 +70,11 @@ theorem HasQuadFactor.of_quadPacking {S : Finset (Finset V)}
     G.HasQuadFactor :=
   ⟨S, hS.1, hS.2, hcov⟩
 
-/-! ## The Erdős–Faudree conjecture, proved by Wang (2010) -/
+/-! ## Assembly downstream
 
-/-- **Core gap (Wang, Wa10).** Under the minimum-degree hypothesis
-`δ(G) ≥ 2k` on `4k` vertices, every quadrilateral packing that fails to cover
-all vertices can be enlarged to a strictly larger one.
-
-This single open step is the mathematical heart of the Erdős–Faudree
-conjecture: Wang's 45-page argument shows that a non-covering packing can
-always be extended to a larger one (via switching arguments on almost-covering
-configurations, bipartite-hole constructions, and extensive case analysis). -/
-theorem exists_larger_quadPacking (k : ℕ) [DecidableRel G.Adj] (hk : 1 ≤ k)
-    (hcard : Fintype.card V = 4 * k) (hmin : 2 * k ≤ G.minDegree)
-    {S : Finset (Finset V)} (hS : G.IsQuadPacking S)
-    (hncov : S.biUnion id ≠ Finset.univ) :
-    ∃ T : Finset (Finset V), G.IsQuadPacking T ∧ S.card < T.card := by
-  sorry
-
-/-- **Wang (Wa10).** Every finite simple graph on `4k` vertices with minimum
-degree at least `2k` contains `k` vertex-disjoint quadrilaterals covering all
-vertices. -/
-theorem spanning_c4_factors_min_degree
-    (G : SimpleGraph V) [DecidableRel G.Adj] (k : ℕ) (hk : 1 ≤ k)
-    (hcard : Fintype.card V = 4 * k)
-    (hmin : 2 * k ≤ G.minDegree) :
-    G.HasQuadFactor := by
-  classical
-  obtain ⟨S, hS, hSmax⟩ := G.exists_max_card_quadPacking
-  by_cases hcov : S.biUnion id = Finset.univ
-  · exact HasQuadFactor.of_quadPacking hS hcov
-  · obtain ⟨T, hT, hlt⟩ :=
-      G.exists_larger_quadPacking k hk hcard hmin hS hcov
-    exact absurd (hSmax T hT) (not_le_of_gt hlt)
+The enlargement step `exists_larger_quadPacking` and the headline theorem
+`spanning_c4_factors_min_degree` live in `JSP467.Top` (downstream of the
+case-analysis files `Clean`/`CaseB`/`LexMax`/`Reduce`, which import this
+module for `IsQuadPacking`). -/
 
 end SimpleGraph
