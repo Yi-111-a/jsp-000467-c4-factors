@@ -100,7 +100,8 @@ theorem exists_quadBlock_or_heavy_leftover (G : SimpleGraph V)
     (∃ u : V, u ∈ Finset.univ \ S.biUnion id ∧
       ∃ B ∈ S, 3 ≤ (B ∩ G.neighborFinset u).card) := by
   classical
-  obtain ⟨hblk, hpair⟩ := hS
+  have hS' := hS
+  obtain ⟨hblk, hpair⟩ := hS'
   -- The blocks of `S` are pairwise disjoint sets of four vertices.
   have hdisj : (S : Set (Finset V)).PairwiseDisjoint id :=
     fun B hB C hC hne => hpair B hB C hC hne
@@ -126,7 +127,8 @@ theorem exists_quadBlock_or_heavy_leftover (G : SimpleGraph V)
         = (Finset.univ \ S.biUnion id).card := by
       rw [← Set.toFinset_card, Finset.toFinset_coe]
     rw [hc, hUcard]
-  obtain ⟨u0, hu0⟩ := hUne
+  have hUne' := hUne
+  obtain ⟨u0, hu0⟩ := hUne'
   haveI : Nonempty ↥(↑(Finset.univ \ S.biUnion id) : Set V) :=
     ⟨⟨u0, Finset.mem_coe.2 hu0⟩⟩
   rcases Nat.lt_or_ge ℓ 2 with hlt2 | hge2
