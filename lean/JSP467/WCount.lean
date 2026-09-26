@@ -69,6 +69,21 @@ theorem crossEdges_comm (A B : Finset V) :
     simp only [Finset.mem_filter, Finset.mem_product]
     exact ⟨⟨hq.1.2, hq.1.1⟩, hq.2.symm⟩
 
+/-- Cross edges from a singleton are just the neighbour count in `B`. -/
+theorem crossEdges_singleton (x : V) (B : Finset V) :
+    crossEdges G {x} B = (B ∩ G.neighborFinset x).card := by
+  unfold crossEdges
+  rw [Finset.sum_singleton]
+
+/-- Cross edges from a two-element set split into the two neighbour
+counts. -/
+theorem crossEdges_pair {x y : V} (h : x ≠ y) (B : Finset V) :
+    crossEdges G {x, y} B =
+      (B ∩ G.neighborFinset x).card +
+        (B ∩ G.neighborFinset y).card := by
+  unfold crossEdges
+  rw [Finset.sum_pair h]
+
 /-- Monotonicity in the second argument. -/
 theorem crossEdges_mono_right {A B B' : Finset V} (h : B ⊆ B') :
     crossEdges G A B ≤ crossEdges G A B' :=

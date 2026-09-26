@@ -32,6 +32,14 @@ namespace SimpleGraph
 
 variable {V : Type*} [Fintype V] [DecidableEq V] {G : SimpleGraph V}
 
+/-- A finset of three elements has cardinality at most three. -/
+theorem card_le_three' {p q r : V} : ({p, q, r} : Finset V).card ≤ 3 := by
+  calc ({p, q, r} : Finset V).card
+      ≤ ({q, r} : Finset V).card + 1 := Finset.card_insert_le _ _
+    _ ≤ ({r} : Finset V).card + 1 + 1 :=
+        Nat.add_le_add_right (Finset.card_insert_le _ _) _
+    _ = 3 := by simp
+
 /-- Extract the cyclic order `a - x - b - y - a` of a quadrilateral block:
 `s = {a, x, b, y}` with the four consecutive cycle adjacencies. -/
 theorem IsQuadBlock.exists_cycle {s : Finset V} (hs : G.IsQuadBlock s) :
@@ -61,6 +69,48 @@ theorem IsQuadBlock.exists_cycle {s : Finset V} (hs : G.IsQuadBlock s) :
     hinj.ne (by decide), hinj.ne (by decide),
     hcyc _ _ (by decide), hcyc _ _ (by decide),
     hcyc _ _ (by decide), hcyc _ _ (by decide)⟩
+
+/-- The `C₄` of a quadrilateral block as an injection `Fin 4 → V`: the four
+vertices of the cycle are pairwise distinct by construction. -/
+theorem IsQuadBlock.exists_cycle_inj {s : Finset V} (hs : G.IsQuadBlock s) :
+    ∃ f : Fin 4 → V, Function.Injective f ∧ (∀ i : Fin 4, f i ∈ s) ∧
+      (∀ i j : Fin 4, (cycleGraph 4).Adj i j → G.Adj (f i) (f j)) := by
+  obtain ⟨_hc, ⟨g⟩⟩ := hs
+  exact ⟨fun i => (g i).1,
+    fun i j h => g.injective (Subtype.ext h),
+    fun i => Finset.mem_coe.1 (g i).2,
+    fun i j h => induce_adj.1 (g.toHom.map_adj h)⟩
+
+/-- `IsQuadBlock.exists_cycle` with all six distinctness side conditions made
+explicit: the four vertices of the cycle are pairwise distinct. -/
+theorem IsQuadBlock.exists_cycle_distinct {s : Finset V} (hs : G.IsQuadBlock s) :
+    ∃ a b x y : V, s = {a, x, b, y} ∧
+      a ≠ x ∧ a ≠ b ∧ a ≠ y ∧ x ≠ b ∧ x ≠ y ∧ b ≠ y ∧
+      G.Adj a x ∧ G.Adj x b ∧ G.Adj b y ∧ G.Adj y a := by
+  obtain ⟨f, hinj, hmem, hadj⟩ := hs.exists_cycle_inj
+  have hsub : ∀ x ∈ (Finset.univ : Finset (Fin 4)), f x ∈ s := fun x _ => hmem x
+  have hs_img : s = Finset.univ.image f := by
+    symm
+    apply Finset.eq_of_subset_of_card_le
+    · rw [Finset.image_subset_iff]
+      exact hsub
+    · rw [Finset.card_image_of_injective _ hinj, Finset.card_univ,
+        Fintype.card_fin, hs.1]
+  have hU0 : (Finset.univ : Finset (Fin 4)) = {0, 1, 2, 3} := by decide
+  have hs4 : s = {f 0, f 1, f 2, f 3} := by
+    rw [hs_img, hU0]
+    simp [Finset.image_insert, Finset.image_singleton]
+  refine ⟨f 0, f 2, f 1, f 3, hs4, ?_, ?_, ?_, ?_, ?_, ?_, ?_, ?_, ?_, ?_⟩
+  · exact hinj.ne (by decide)
+  · exact hinj.ne (by decide)
+  · exact hinj.ne (by decide)
+  · exact hinj.ne (by decide)
+  · exact hinj.ne (by decide)
+  · exact hinj.ne (by decide)
+  · exact hadj _ _ (by decide)
+  · exact hadj _ _ (by decide)
+  · exact hadj _ _ (by decide)
+  · exact hadj _ _ (by decide)
 
 /-- In a quadrilateral block, the two antipodal vertices of its `C₄` share
 the other two vertices as common neighbours inside the block. -/
