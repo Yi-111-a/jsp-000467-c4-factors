@@ -58,6 +58,7 @@ theorem k4Count_lt_bound {S : Finset (Finset V)} (hS : G.IsQuadPacking S)
     k4Count G S < C := by
   have h1 := k4Count_le_card (G := G) S
   have h2 := card_mul_four_le_univ (G := G) hS
+  have h3 := Nat.le_mul_self (Fintype.card V)
   omega
 
 /-- **Three-coordinate lexicographic maximizer** — Wang's extremal choice:
@@ -109,9 +110,9 @@ theorem exists_lexmax3_packing (m : ℕ)
         rwa [add_mul, one_mul] at h'
       have hC2 : k4Count G S * C + edgeSum G (Finset.univ \ S.biUnion id)
           < C * C := by
-        have h1 : k4Count G S * C ≤ (C - 1) * C := by
-          have : k4Count G S + 1 ≤ C := hSk
-          have h' := Nat.mul_le_mul this (le_refl C)
+        have h1 : k4Count G S * C + C ≤ C * C := by
+          have hsk : k4Count G S + 1 ≤ C := hSk
+          have h' := Nat.mul_le_mul hsk (le_refl C)
           rwa [add_mul, one_mul] at h'
         omega
       omega
